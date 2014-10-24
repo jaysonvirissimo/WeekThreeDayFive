@@ -10,7 +10,7 @@ class SQLObject
   end
 
   def self.columns
-    column_names = DBConnection.execute2(self.columns_query).first.collect(&:intern)
+    DBConnection.execute2(self.columns_query).first.collect(&:intern)
   end
 
   # Call finalize! at the end of any subclasses of SQLObject.
@@ -69,10 +69,38 @@ class SQLObject
   end
 
   def attribute_values
+    self.class.columns.map do |attribute_name|
+      puts attribute_name
+      self.send(attribute_name)
+    end
+  end
+
+  def insert_query(names, marks)
+    "INSERT INTO #{self.class.table_name} (#{names}) VALUES (#{marks})"
+  end
+
+  def column_names
+    self.class.columns.map(&:to_s).join(", ")
+  end
+
+  def question_marks
+    array = []
+
+    number_of_columns.times do
+      array << "?"
+    end
+
+    array.join(", ")
+  end
+
+  def number_of_columns
+    self.class.columns.length
   end
 
   def insert
-    # ...
+    values = attribute_values
+    DBConnection.execute(insert_query(column_names, question_marks), *values)
+    self.id = DBConnection.last_insert_row_id
   end
 
   def update
