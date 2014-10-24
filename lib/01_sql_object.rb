@@ -69,10 +69,7 @@ class SQLObject
   end
 
   def attribute_values
-    self.class.columns.map do |attribute_name|
-      puts attribute_name
-      self.send(attribute_name)
-    end
+    self.class.columns.map { |attribute_name| self.send(attribute_name) }
   end
 
   def insert_query(names, marks)
@@ -103,11 +100,19 @@ class SQLObject
     self.id = DBConnection.last_insert_row_id
   end
 
+  def set_line
+    self.class.columns.map { |column_name| "#{column_name} = ?" }.join(", ")
+  end
+
+  def update_query
+    "UPDATE #{self.class.table_name} SET #{set_line} WHERE id = ?"
+  end
+
   def update
-    # ...
+    DBConnection.execute(update_query, *attribute_values, self.id)
   end
 
   def save
-    # ...
+    if id.nil? then insert else update end
   end
 end
