@@ -10,17 +10,22 @@ class SQLObject
       *
     FROM
       #{table_name}
+    LIMIT
+      1
     SQL
-    column_names = DBConnection.execute(query).first.collect do |column_name|
-      column_name.first.intern
-    end
-
-    column_name.each do |column_name|
-      # create atter_accessors
-    end
+    column_names = DBConnection.execute2(query).first.collect(&:intern)
   end
 
+  # Call finalize! at the end of any subclasses of SQLObject.
   def self.finalize!
+    columns.each do |column_name|    
+      define_method(column_name) do
+        self.attributes[column_name]
+      end
+      define_method("#{column_name}=") do |value|
+        self.attributes[column_name] = value
+      end
+    end
   end
 
   def self.table_name=(table_name)
@@ -44,15 +49,19 @@ class SQLObject
   end
 
   def initialize(params = {})
-    # ...
+    params.collect.each do |attr_name, value|
+      unless attributes.keys.include?(attr_name.intern)
+        raise "unknown attribute '#{attr_name}'"
+      end
+      # self.send("attr_name=".intern, value)
+    end
   end
 
   def attributes
-    # ...
+    @attributes ||= {}
   end
 
   def attribute_values
-    # ...
   end
 
   def insert
