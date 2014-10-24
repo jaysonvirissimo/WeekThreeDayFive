@@ -5,6 +5,19 @@ require 'active_support/inflector'
 
 class SQLObject
   def self.columns
+    query = <<-SQL
+    SELECT
+      *
+    FROM
+      #{table_name}
+    SQL
+    column_names = DBConnection.execute(query).first.collect do |column_name|
+      column_name.first.intern
+    end
+
+    column_name.each do |column_name|
+      # create atter_accessors
+    end
   end
 
   def self.finalize!
