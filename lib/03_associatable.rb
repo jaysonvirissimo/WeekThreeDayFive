@@ -28,7 +28,13 @@ end
 
 class HasManyOptions < AssocOptions
   def initialize(name, self_class_name, options = {})
-    # ...
+    if options[:foreign_key]
+      @foreign_key = options[:foreign_key]
+    else
+      @foreign_key = "#{self_class_name.underscore}_id".intern
+    end
+    @class_name = options[:class_name] || name.camelcase.singularize
+    @primary_key = options[:primary_key] || "id".intern
   end
 end
 
