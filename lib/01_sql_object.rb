@@ -37,11 +37,24 @@ class SQLObject
   end
 
   def self.all
-    # ...
+    query = <<-SQL
+    SELECT
+      #{table_name}.*
+    FROM
+      #{table_name}
+    SQL
+    array_of_hashes = DBConnection.execute(query)
+    self.parse_all(array_of_hashes)
   end
 
   def self.parse_all(results)
-    # ...
+    array_of_objects = []
+
+    results.each do |hash|
+      array_of_objects << self.to_s.constantize.new(hash)
+    end
+
+    array_of_objects
   end
 
   def self.find(id)
