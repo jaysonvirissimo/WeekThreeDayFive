@@ -5,18 +5,17 @@ require 'active_support/inflector'
 
 class SQLObject
   def self.columns
-    # ...
   end
 
   def self.finalize!
   end
 
   def self.table_name=(table_name)
-    # ...
+    @table_name = table_name
   end
 
   def self.table_name
-    # ...
+    @table_name ||= self.to_s.tableize
   end
 
   def self.all
