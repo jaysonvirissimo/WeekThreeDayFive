@@ -18,7 +18,7 @@ class SQLObject
 
   # Call finalize! at the end of any subclasses of SQLObject.
   def self.finalize!
-    columns.each do |column_name|    
+    columns.each do |column_name|
       define_method(column_name) do
         self.attributes[column_name]
       end
@@ -49,11 +49,11 @@ class SQLObject
   end
 
   def initialize(params = {})
-    params.collect.each do |attr_name, value|
-      unless attributes.keys.include?(attr_name.intern)
+    params.each do |attr_name, value|
+      unless self.class.columns.include?(attr_name.intern)
         raise "unknown attribute '#{attr_name}'"
       end
-      # self.send("attr_name=".intern, value)
+      self.send("#{attr_name}=".intern, value)
     end
   end
 
