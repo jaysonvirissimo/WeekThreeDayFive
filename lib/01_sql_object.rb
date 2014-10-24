@@ -4,16 +4,13 @@ require 'active_support/inflector'
 # of this project. It was only a warm up.
 
 class SQLObject
+
+  def self.columns_query
+    "SELECT * FROM #{table_name} LIMIT 1"
+  end
+
   def self.columns
-    query = <<-SQL
-    SELECT
-      *
-    FROM
-      #{table_name}
-    LIMIT
-      1
-    SQL
-    column_names = DBConnection.execute2(query).first.collect(&:intern)
+    column_names = DBConnection.execute2(self.columns_query).first.collect(&:intern)
   end
 
   # Call finalize! at the end of any subclasses of SQLObject.
@@ -36,38 +33,26 @@ class SQLObject
     @table_name ||= self.to_s.tableize
   end
 
+  def self.find_all_query
+    "SELECT #{table_name}.* FROM #{table_name}"
+  end
+
   def self.all
-    query = <<-SQL
-    SELECT
-      #{table_name}.*
-    FROM
-      #{table_name}
-    SQL
-    array_of_hashes = DBConnection.execute(query)
-    self.parse_all(array_of_hashes)
+    self.parse_all(DBConnection.execute(self.find_all_query))
   end
 
   def self.parse_all(results)
-    array_of_objects = []
-
-    results.each do |hash|
-      array_of_objects << self.to_s.constantize.new(hash)
+    results.map do |hash|
+      self.to_s.constantize.new(hash)
     end
+  end
 
-    array_of_objects
+  def self.find_by_id_query
+    "SELECT * FROM #{table_name} WHERE #{table_name}.id = ?"
   end
 
   def self.find(id)
-    query = <<-SQL
-    SELECT
-    *
-    FROM
-    #{table_name}
-    WHERE
-    #{table_name}.id = ?
-    SQL
-    hash = DBConnection.execute(query, id)
-    self.parse_all(hash).first
+    self.parse_all(DBConnection.execute(self.find_by_id_query, id)).first
   end
 
   def initialize(params = {})
