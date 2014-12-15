@@ -7,11 +7,11 @@ module Searchable
   end
 
   def where_query(params)
-    "SELECT * FROM #{self.table_name} WHERE #{where_line(params)}"
+    "SELECT * FROM #{table_name} WHERE #{where_line(params)}"
   end
 
   def where_line(params)
-    params.keys.map { |column| "#{column} = ?" }.join(" AND ")
+    params.keys.map { |column| "#{column} = ?" }.join(' AND ')
   end
 end
 

@@ -1,7 +1,5 @@
 require_relative 'db_connection'
 require 'active_support/inflector'
-# NB: the attr_accessor we wrote in phase 0 is NOT used in the rest
-# of this project. It was only a warm up.
 
 class SQLObject
 
@@ -13,7 +11,6 @@ class SQLObject
     DBConnection.execute2(self.columns_query).first.collect(&:intern)
   end
 
-  # Call finalize! at the end of any subclasses of SQLObject.
   def self.finalize!
     columns.each do |column_name|
       define_method(column_name) do

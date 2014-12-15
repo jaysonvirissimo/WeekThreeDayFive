@@ -6,7 +6,7 @@ class AttrAccessorObject
         @#{name} = value
       end
       SETTER
-      self.class_eval(setter)
+      class_eval(setter)
 
       define_method(name) do
         instance_variable_get("@#{name}")

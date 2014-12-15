@@ -42,7 +42,7 @@ describe SQLObject do
 
     it '::columns creates setter methods for each column' do
       c = Cat.new
-      c.name = "Nick Diaz"
+      c.name = 'Nick Diaz'
       c.id = 209
       c.owner_id = 2
       expect(c.name).to eq 'Nick Diaz'
@@ -52,7 +52,7 @@ describe SQLObject do
 
     it '::columns created setter methods use attributes hash to store data' do
       c = Cat.new
-      c.name = "Nick Diaz"
+      c.name = 'Nick Diaz'
       expect(c.instance_variables).to eq [:@attributes]
       expect(c.attributes[:name]).to eq 'Nick Diaz'
     end
